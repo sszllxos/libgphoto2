@@ -3905,6 +3905,61 @@ ptp_canon_eos_setdevicepropvalueex (PTPParams* params, unsigned char* data, unsi
 	return ptp_transaction(params, &ptp, PTP_DP_SENDDATA, size, &data, NULL);
 }
 
+uint16_t 
+extest(PTPParams* params) {
+	// lijing
+	GP_LOG_D("lijing debug");
+
+	PTPContainer	ptp;
+	unsigned char	*data = NULL;
+	unsigned int	size;
+	uint16_t	ret;
+
+	uint16_t propcode  = PTP_DPC_CANON_EOS_PictureStyleExStandard;
+	// uint16_t propcode  = PTP_DPC_CANON_EOS_PictureStyleExUserSet1;
+
+	PTPDevicePropDesc testdpd;
+	ptp_canon_eos_getdevicepropdesc(params, propcode, &testdpd);
+	
+	PTPDevicePropDesc *dpd = ptp_find_eos_devicepropdesc(params, propcode);
+	if (!dpd)
+		return PTP_RC_Undefined;
+
+	PTP_CNT_INIT(ptp, PTP_OC_CANON_EOS_SetDevicePropValueEx);
+
+	dpd = ptp_find_eos_devicepropdesc(params, propcode);
+	if (!dpd)
+		return PTP_RC_Undefined;
+
+	size = 48;
+	data = calloc(size,sizeof(char));
+	memset(data, 0, size);
+
+	htod32a(&data[0], size);
+	htod32a(&data[4], propcode);
+
+	// constract
+	memset(data+16, 2, 1);
+	// sharpness-strength
+	memset(data+20, 2, 1);
+	// saturation
+	memset(data+24, 3, 1);
+	// color tone
+	memset(data+28, 3, 1);
+	// 
+	// memset(data+32, 4, 1);
+	// 
+	// memset(data+36, 5, 1);
+	// sharpness-fineness
+	memset(data+40, 4, 1);
+	// sharpness-throld
+	memset(data+44, 5, 1);
+
+	ret = ptp_transaction(params, &ptp, PTP_DP_SENDDATA, size, &data, NULL);
+	free(data);
+	return ret;
+}
+
 uint16_t
 ptp_canon_eos_setdevicepropvalue (PTPParams* params,
 	uint16_t propcode, PTPPropValue *value, uint16_t datatype
@@ -3913,6 +3968,11 @@ ptp_canon_eos_setdevicepropvalue (PTPParams* params,
 	uint16_t	ret;
 	unsigned char	*data = NULL;
 	unsigned int	size;
+
+	if (propcode == PTP_DPC_CANON_EOS_PictureStyle) {
+		GP_LOG_D("lijing debug");
+		return extest(params);
+	}
 
 	PTPDevicePropDesc *dpd = ptp_find_eos_devicepropdesc(params, propcode);
 	if (!dpd)
