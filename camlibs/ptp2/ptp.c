@@ -3914,9 +3914,10 @@ extest(PTPParams* params) {
 	unsigned char	*data = NULL;
 	unsigned int	size;
 	uint16_t	ret;
+	int base = 0;
 
-	uint16_t propcode  = PTP_DPC_CANON_EOS_PictureStyleExStandard;
-	// uint16_t propcode  = PTP_DPC_CANON_EOS_PictureStyleExUserSet1;
+	// uint16_t propcode  = PTP_DPC_CANON_EOS_PictureStyleExStandard;
+	uint16_t propcode  = PTP_DPC_CANON_EOS_PictureStyleExUserSet1;
 
 	PTPDevicePropDesc testdpd;
 	ptp_canon_eos_getdevicepropdesc(params, propcode, &testdpd);
@@ -3931,29 +3932,35 @@ extest(PTPParams* params) {
 	if (!dpd)
 		return PTP_RC_Undefined;
 
-	size = 48;
+	if (propcode == PTP_DPC_CANON_EOS_PictureStyleExStandard) {
+		size = 48;
+		base = 16;
+	} else {
+		size = 52;
+		base = 20;
+	}
+	
 	data = calloc(size,sizeof(char));
 	memset(data, 0, size);
 
 	htod32a(&data[0], size);
 	htod32a(&data[4], propcode);
 
+	if (propcode == PTP_DPC_CANON_EOS_PictureStyleExUserSet1) {
+		memset(data+base - 4, 130, 1);
+	}
 	// constract
-	memset(data+16, 2, 1);
+	memset(data+base, 2, 1);
 	// sharpness-strength
-	memset(data+20, 2, 1);
+	memset(data+base+4, 2, 1);
 	// saturation
-	memset(data+24, 3, 1);
+	memset(data+base+8, 3, 1);
 	// color tone
-	memset(data+28, 3, 1);
-	// 
-	// memset(data+32, 4, 1);
-	// 
-	// memset(data+36, 5, 1);
+	memset(data+base+12, 3, 1);
 	// sharpness-fineness
-	memset(data+40, 4, 1);
+	memset(data+base+24, 4, 1);
 	// sharpness-throld
-	memset(data+44, 5, 1);
+	memset(data+base+28, 5, 1);
 
 	ret = ptp_transaction(params, &ptp, PTP_DP_SENDDATA, size, &data, NULL);
 	free(data);
