@@ -364,6 +364,9 @@ int gp_camera_get_port_speed    (Camera *camera);
 
 /**@}*/
 
+// lijing
+int gp_camera_set_android_fd (Camera *camera, int fd, const char* dir);
+
 
 /** \name Initialization
  * @{

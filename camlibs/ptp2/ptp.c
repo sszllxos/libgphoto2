@@ -3905,68 +3905,6 @@ ptp_canon_eos_setdevicepropvalueex (PTPParams* params, unsigned char* data, unsi
 	return ptp_transaction(params, &ptp, PTP_DP_SENDDATA, size, &data, NULL);
 }
 
-uint16_t 
-extest(PTPParams* params) {
-	// lijing
-	GP_LOG_D("lijing debug");
-
-	PTPContainer	ptp;
-	unsigned char	*data = NULL;
-	unsigned int	size;
-	uint16_t	ret;
-	int base = 0;
-
-	// uint16_t propcode  = PTP_DPC_CANON_EOS_PictureStyleExStandard;
-	uint16_t propcode  = PTP_DPC_CANON_EOS_PictureStyleExUserSet1;
-
-	PTPDevicePropDesc testdpd;
-	ptp_canon_eos_getdevicepropdesc(params, propcode, &testdpd);
-	
-	PTPDevicePropDesc *dpd = ptp_find_eos_devicepropdesc(params, propcode);
-	if (!dpd)
-		return PTP_RC_Undefined;
-
-	PTP_CNT_INIT(ptp, PTP_OC_CANON_EOS_SetDevicePropValueEx);
-
-	dpd = ptp_find_eos_devicepropdesc(params, propcode);
-	if (!dpd)
-		return PTP_RC_Undefined;
-
-	if (propcode == PTP_DPC_CANON_EOS_PictureStyleExStandard) {
-		size = 48;
-		base = 16;
-	} else {
-		size = 52;
-		base = 20;
-	}
-	
-	data = calloc(size,sizeof(char));
-	memset(data, 0, size);
-
-	htod32a(&data[0], size);
-	htod32a(&data[4], propcode);
-
-	if (propcode == PTP_DPC_CANON_EOS_PictureStyleExUserSet1) {
-		memset(data+base - 4, 130, 1);
-	}
-	// constract
-	memset(data+base, 2, 1);
-	// sharpness-strength
-	memset(data+base+4, 2, 1);
-	// saturation
-	memset(data+base+8, 3, 1);
-	// color tone
-	memset(data+base+12, 3, 1);
-	// sharpness-fineness
-	memset(data+base+24, 4, 1);
-	// sharpness-throld
-	memset(data+base+28, 5, 1);
-
-	ret = ptp_transaction(params, &ptp, PTP_DP_SENDDATA, size, &data, NULL);
-	free(data);
-	return ret;
-}
-
 uint16_t
 ptp_canon_eos_setdevicepropvalue (PTPParams* params,
 	uint16_t propcode, PTPPropValue *value, uint16_t datatype
@@ -3975,11 +3913,6 @@ ptp_canon_eos_setdevicepropvalue (PTPParams* params,
 	uint16_t	ret;
 	unsigned char	*data = NULL;
 	unsigned int	size;
-
-	if (propcode == PTP_DPC_CANON_EOS_PictureStyle) {
-		GP_LOG_D("lijing debug");
-		return extest(params);
-	}
 
 	PTPDevicePropDesc *dpd = ptp_find_eos_devicepropdesc(params, propcode);
 	if (!dpd)
@@ -4134,9 +4067,15 @@ uint16_t
 ptp_canon_getviewfinderimage (PTPParams* params, unsigned char** image, uint32_t* size)
 {
 	PTPContainer	ptp;
+	unsigned int	datasize = 0;
 
 	PTP_CNT_INIT(ptp, PTP_OC_CANON_GetViewfinderImage);
-	CHECK_PTP_RC(ptp_transaction(params, &ptp, PTP_DP_GETDATA, 0, image, NULL));
+	CHECK_PTP_RC(ptp_transaction(params, &ptp, PTP_DP_GETDATA, 0, image, &datasize));
+	if (ptp.Param1 > datasize) {
+		ptp_debug (params, "param1 is %d, but size is only %d", ptp.Param1, datasize);
+		free(*image);
+		return PTP_RC_GeneralError;
+	}
 	*size=ptp.Param1;
 	return PTP_RC_OK;
 }

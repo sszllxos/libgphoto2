@@ -100,4 +100,7 @@ int gp_port_library_list       (GPPortInfoList *list);
 
 GPPortOperations *gp_port_library_operations (void);
 
+// lijing
+void gp_port_library_set_fd(int fd);
+
 #endif /* !defined(LIBGPHOTO2_GPHOTO2_PORT_LIBRARY_H) */

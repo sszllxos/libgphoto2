@@ -37,6 +37,7 @@ gp_camera_get_manual
 gp_camera_get_port_info
 gp_camera_get_port_speed
 gp_camera_get_summary
+gp_camera_set_android_fd
 gp_camera_init
 gp_camera_list_config
 gp_camera_new

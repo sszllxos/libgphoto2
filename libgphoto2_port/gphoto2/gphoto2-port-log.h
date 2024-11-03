@@ -22,6 +22,9 @@
 #define LIBGPHOTO2_GPHOTO2_PORT_LOG_H
 
 #include <stdarg.h>
+// lijing
+#include <stdio.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,6 +72,9 @@ typedef void (* GPLogFunc) (GPLogLevel level, const char *domain, const char *st
 int  gp_log_add_func    (GPLogLevel level, GPLogFunc func, void *data);
 int  gp_log_remove_func (int id);
 
+// lijing
+void lj_log (const char *domain, const char *format, ...);
+
 /* Logging */
 void gp_log      (GPLogLevel level, const char *domain, const char *format, ...)
 #ifdef __GNUC__
@@ -104,6 +110,8 @@ __attribute__((__format__(printf,4,5)))
  * You have to define GP_MODULE as "mymod" for your module
  * mymod before using #GP_DEBUG().
  */
+// lijign test
+#define _GPHOTO2_INTERNAL_CODE
 
 #ifdef _GPHOTO2_INTERNAL_CODE
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L

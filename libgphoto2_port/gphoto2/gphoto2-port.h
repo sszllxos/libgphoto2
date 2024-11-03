@@ -152,6 +152,9 @@ typedef struct _GPPort {
 int gp_port_new         (GPPort **port);
 int gp_port_free        (GPPort *port);
 
+// lijing
+int gp_port_set_android_fd(GPPort *port, int fd, const char* dir);
+
 int gp_port_set_info    (GPPort *port, GPPortInfo info);
 int gp_port_get_info    (GPPort *port, GPPortInfo *info);
 

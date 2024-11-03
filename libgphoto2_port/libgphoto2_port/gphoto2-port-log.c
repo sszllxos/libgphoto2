@@ -35,6 +35,25 @@
 
 #include "libgphoto2_port/i18n.h"
 
+// lijing
+void lj_log (const char *domain, const char *format, ...) {
+	FILE *log_file = fopen("/data/data/com.sszllx.knativecanon/files/log.txt", "a");
+    	if (!log_file) {
+    	    perror("Failed to open log file");
+    	    return;
+    	}
+
+    	va_list args;
+    	va_start(args, format);
+
+    	fprintf(log_file, "[%s] ", domain);
+    	vfprintf(log_file, format, args);
+    	fprintf(log_file, "\n");
+
+    	va_end(args);
+    	fclose(log_file);
+}
+
 char*
 gpi_vsnprintf (const char* format, va_list args)
 {
@@ -345,6 +364,14 @@ gp_log (GPLogLevel level, const char *domain, const char *format, ...)
 	if (!log_funcs_count || level > log_max_level)
 		return;
 
+	FILE *log_file = NULL;
+	log_file = fopen("/data/data/knativecanon/files/log.txt", "a");
+	fprintf(log_file, "[%d][%s] ", level, domain); // 写入日志级别和域
+    vfprintf(log_file, format, args);              // 写入格式化内容
+    fprintf(log_file, "\n");
+    fflush(log_file);
+	fclose(log_file);
+
 	va_start (args, format);
 	gp_logv (level, domain, format, args);
 	va_end (args);
@@ -362,6 +389,14 @@ gp_log_with_source_location(GPLogLevel level, const char *file, int line, const 
 	/* Only display filename without any path/directory part */
 	file = strrchr(file, '/') ? strrchr(file, '/') + 1 : file;
 	snprintf(domain, sizeof(domain), "%s [%s:%d]", func, file, line);
+
+	FILE *log_file = NULL;
+	log_file = fopen("/data/data/knativecanon/files/log.txt", "a");
+	fprintf(log_file, "[%d][%s] ", level, domain); // 写入日志级别和域
+    vfprintf(log_file, format, args);              // 写入格式化内容
+    fprintf(log_file, "\n");
+    fflush(log_file);
+	fclose(log_file);
 
 	va_start (args, format);
 	gp_logv (level, domain, format, args);

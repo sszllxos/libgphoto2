@@ -39,6 +39,7 @@ LIBGPHOTO2_5_0 {
 	gp_port_send_break;
 	gp_port_send_scsi_cmd;
 	gp_port_set_error;
+	gp_port_set_android_fd;
 	gp_port_set_info;
 	gp_port_set_pin;
 	gp_port_set_settings;

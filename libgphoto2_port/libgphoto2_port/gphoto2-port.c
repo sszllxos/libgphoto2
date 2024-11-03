@@ -32,6 +32,9 @@
 #include <stdio.h>
 #include <string.h>
 
+// lijing
+#include <errno.h>
+
 #include <ltdl.h>
 
 #include <gphoto2/gphoto2-port-result.h>
@@ -120,6 +123,147 @@ gp_port_exit (GPPort *port)
 
 	return (GP_OK);
 }
+
+// lijing
+int
+gp_port_set_android_fd(GPPort *port, int fd, const char* dir) {
+	int ret;
+
+	GPPortLibraryOperations ops_func;
+
+	C_PARAMS (port);
+
+	// free (port->pc->info.name);
+	// C_MEM (port->pc->info.name = strdup (info->name));
+	// free (port->pc->info.path);
+	// C_MEM (port->pc->info.path = strdup (info->path));
+	// port->pc->info.type = info->type;
+	// free (port->pc->info.library_filename);
+	// C_MEM (port->pc->info.library_filename = strdup (info->library_filename));
+
+	// port->type = info->type;
+
+	/* Clean up */
+	if (port->pc->ops) {
+		gp_port_exit (port);
+		free (port->pc->ops);
+		port->pc->ops = NULL;
+	}
+	if (port->pc->lh) {
+#if !defined(VALGRIND)
+		gpi_libltdl_lock();
+		lt_dlclose (port->pc->lh);
+		lt_dlexit ();
+		gpi_libltdl_unlock();
+#endif
+	}
+
+	gpi_libltdl_lock();
+	lt_dlinit ();
+	// port->pc->lh = lt_dlopenext (info->library_filename);
+	// FILE *file = fopen("cache/0.12.2/usb1.so", "r");
+	// char *name = "libexif.so";
+	FILE *file = fopen(dir, "r");
+	if (file) {
+		lj_log("ljx", "file exist");
+	} else {
+		lj_log("ljx", "%s file not exist  %s", dir, strerror(errno));
+	}
+
+	// port->pc->lh = lt_dlopenext ("cache/0.12.2/usb1.so");
+	port->pc->lh = lt_dlopenext (dir);
+	gpi_libltdl_unlock();
+	if (!port->pc->lh) {
+		gpi_libltdl_lock();
+		// GP_LOG_E ("Could not load '%s' ('%s').", info->library_filename, lt_dlerror ());
+		GP_LOG_E ("Could not load libusb-1.0.so ('%s').", lt_dlerror ());
+		lt_dlexit ();
+		gpi_libltdl_unlock();
+		return (GP_ERROR_LIBRARY);
+	}
+
+	void (*set_fd)(int);
+	/* Load the operations */
+	gpi_libltdl_lock();
+	set_fd = (void (*)(int)) lt_dlsym (port->pc->lh, "gp_port_library_set_fd");
+	gpi_libltdl_unlock();
+
+	if (set_fd == NULL) {
+		GP_LOG_E("Could not find gp_port_library_set_fd function");
+		return;
+	}
+
+	GP_LOG_D("set fd ===============> %d", fd);
+	set_fd(fd);
+}
+
+// int
+// gp_port_set_info_internal(GPPort *port) {
+// 	int ret;
+
+// 	GPPortLibraryOperations ops_func;
+
+// 	C_PARAMS (port);
+
+
+// 		/* Load the operations */
+// 	gpi_libltdl_lock();
+// 	ops_func = lt_dlsym (port->pc->lh, "gp_port_library_operations");
+// 	gpi_libltdl_unlock();
+// 	if (!ops_func) {
+// 		gpi_libltdl_lock();
+// 		GP_LOG_E ("Could not find 'gp_port_library_operations' in '%s' ('%s')",
+// 			  info->library_filename, lt_dlerror ());
+// 		lt_dlclose (port->pc->lh);
+// 		lt_dlexit ();
+// 		gpi_libltdl_unlock();
+// 		port->pc->lh = NULL;
+// 		return (GP_ERROR_LIBRARY);
+// 	}
+// 	port->pc->ops = ops_func ();
+// 	gp_port_init (port);
+
+// 	/* Initialize the settings to some default ones */
+// 	switch (info->type) {
+// 	case GP_PORT_SERIAL:
+// 		port->settings.serial.speed = 0;
+// 		port->settings.serial.bits = 8;
+// 		port->settings.serial.parity = 0;
+// 		port->settings.serial.stopbits = 1;
+// 		gp_port_set_timeout (port, 500);
+// 		break;
+// 	case GP_PORT_USB:
+// 		if (sizeof (port->settings.usb.port) <= strlen(info->path)) {
+// 			GP_LOG_E ("Path is too long for static buffer '%s'.", info->path);
+// 			return GP_ERROR_LIBRARY;
+// 		}
+// 		strncpy (port->settings.usb.port, info->path,
+// 			 sizeof (port->settings.usb.port));
+// 		port->settings.usb.inep = -1;
+// 		port->settings.usb.outep = -1;
+// 		port->settings.usb.config = -1;
+// 		port->settings.usb.interface = 0;
+// 		port->settings.usb.altsetting = -1;
+// 		gp_port_set_timeout (port, 5000);
+// 		break;
+// 	case GP_PORT_USB_DISK_DIRECT:
+// 		snprintf(port->settings.usbdiskdirect.path,
+// 			 sizeof(port->settings.usbdiskdirect.path), "%s",
+// 			 strchr(info->path, ':') + 1);
+// 		break;
+// 	case GP_PORT_USB_SCSI:
+// 		snprintf(port->settings.usbscsi.path,
+// 			 sizeof(port->settings.usbscsi.path), "%s",
+// 			 strchr(info->path, ':') + 1);
+// 		break;
+// 	default:
+// 		/* Nothing in here */
+// 		break;
+// 	}
+// 	ret = gp_port_set_settings (port, port->settings);
+// 	if (ret != GP_ERROR_NOT_SUPPORTED)
+// 		CHECK_RESULT (ret);
+// }
 
 /**
  * \brief Configure a port

@@ -401,6 +401,17 @@ gp_camera_get_port_info (Camera *camera, GPPortInfo *info)
 	return (GP_OK);
 }
 
+// lijing
+int
+gp_camera_set_port_android_fd (Camera *camera, int fd, const char* dir) {
+	if (camera->pc->lh)
+		gp_camera_exit (camera, NULL);
+
+	CR (camera, gp_port_set_android_fd (camera->port, fd, dir), NULL);
+
+	return (GP_OK);
+}
+
 
 int
 gp_camera_set_port_info (Camera *camera, GPPortInfo info)
@@ -646,6 +657,14 @@ out:
 	if (ret < GP_OK)
 		return ret;
 	return gp_list_count(list);
+}
+
+// lijing
+int
+gp_camera_set_android_fd (Camera *camera, int fd, const char* dir)
+{
+	int ret = gp_camera_set_port_android_fd (camera, fd, dir);
+	return ret; 
 }
 
 /**

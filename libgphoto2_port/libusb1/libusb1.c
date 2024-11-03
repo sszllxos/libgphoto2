@@ -229,6 +229,7 @@ gp_port_library_list (GPPortInfoList *list)
 	int		nrofdevs = 0;
 	struct libusb_device_descriptor	*descs;
 
+
 #ifdef  HAVE_LIBUSB_WRAP_SYS_DEVICE
 	if (has_external_fd()) {
 		ctx = external_sys_device.ctx;
@@ -1600,6 +1601,11 @@ gp_libusb1_find_device_by_class_lib(GPPort *port, int class, int subclass, int p
 		"is connected to the computer."), class, subclass, protocol);
 #endif
 	return GP_ERROR_IO_USB_FIND;
+}
+
+// lijing
+void gp_port_library_set_fd(int fd) {
+	gp_port_usb_set_sys_device(fd);
 }
 
 GPPortOperations *
