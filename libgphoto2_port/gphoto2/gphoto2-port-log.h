@@ -73,7 +73,7 @@ int  gp_log_add_func    (GPLogLevel level, GPLogFunc func, void *data);
 int  gp_log_remove_func (int id);
 
 // lijing
-// void lj_log (const char *domain, const char *format, ...);
+void lj_log (const char *domain, const char *format, ...);
 
 /* Logging */
 void gp_log      (GPLogLevel level, const char *domain, const char *format, ...)

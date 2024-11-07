@@ -43,6 +43,25 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
+void lj_log (const char *domain, const char *format, ...) {
+       FILE *log_file = fopen("/data/data/com.sszllx.knativecanon/files/log.txt", "a");
+       if (!log_file) {
+           perror("Failed to open log file");
+           return;
+       }
+
+       va_list args;
+       va_start(args, format);
+
+       fprintf(log_file, "[%s] ", domain);
+       vfprintf(log_file, format, args);
+       fprintf(log_file, "\n");
+
+       va_end(args);
+       fclose(log_file);
+}
+
+
 char*
 gpi_vsnprintf (const char* format, va_list args)
 {
