@@ -153,3 +153,5 @@ Makefile.in
 /tests/test-pedantic-cxx98
 
 /tmpwrk*/
+
+_build

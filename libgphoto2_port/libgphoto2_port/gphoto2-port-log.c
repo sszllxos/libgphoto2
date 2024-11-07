@@ -36,23 +36,12 @@
 #include "libgphoto2_port/i18n.h"
 
 // lijing
-void lj_log (const char *domain, const char *format, ...) {
-	FILE *log_file = fopen("/data/data/com.sszllx.knativecanon/files/log.txt", "a");
-    	if (!log_file) {
-    	    perror("Failed to open log file");
-    	    return;
-    	}
+#include <android/log.h>
 
-    	va_list args;
-    	va_start(args, format);
-
-    	fprintf(log_file, "[%s] ", domain);
-    	vfprintf(log_file, format, args);
-    	fprintf(log_file, "\n");
-
-    	va_end(args);
-    	fclose(log_file);
-}
+#define LOG_TAG "ljx"
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 char*
 gpi_vsnprintf (const char* format, va_list args)
@@ -364,16 +353,26 @@ gp_log (GPLogLevel level, const char *domain, const char *format, ...)
 	if (!log_funcs_count || level > log_max_level)
 		return;
 
-	FILE *log_file = NULL;
-	log_file = fopen("/data/data/knativecanon/files/log.txt", "a");
-	fprintf(log_file, "[%d][%s] ", level, domain); // 写入日志级别和域
-    vfprintf(log_file, format, args);              // 写入格式化内容
-    fprintf(log_file, "\n");
-    fflush(log_file);
-	fclose(log_file);
-
 	va_start (args, format);
 	gp_logv (level, domain, format, args);
+
+		// 根据日志级别选择合适的日志宏
+	switch (level) {
+		case GP_LOG_DEBUG:
+			LOGD("[%s] ", domain);
+			__android_log_vprint(ANDROID_LOG_DEBUG, LOG_TAG, format, args);
+			break;
+		case GP_LOG_ERROR:
+			LOGE("[%s] ", domain);
+			__android_log_vprint(ANDROID_LOG_ERROR, LOG_TAG, format, args);
+			break;
+		default:
+			// 默认记录为 INFO 级别
+			LOGI("[%s] ", domain);
+			__android_log_vprint(ANDROID_LOG_INFO, LOG_TAG, format, args);
+			break;
+	}
+	
 	va_end (args);
 }
 

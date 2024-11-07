@@ -163,12 +163,12 @@ gp_port_set_android_fd(GPPort *port, int fd, const char* dir) {
 	// port->pc->lh = lt_dlopenext (info->library_filename);
 	// FILE *file = fopen("cache/0.12.2/usb1.so", "r");
 	// char *name = "libexif.so";
-	FILE *file = fopen(dir, "r");
-	if (file) {
-		lj_log("ljx", "file exist");
-	} else {
-		lj_log("ljx", "%s file not exist  %s", dir, strerror(errno));
-	}
+	// FILE *file = fopen(dir, "r");
+	// if (file) {
+	// 	lj_log("ljx", "file exist");
+	// } else {
+	// 	lj_log("ljx", "%s file not exist  %s", dir, strerror(errno));
+	// }
 
 	// port->pc->lh = lt_dlopenext ("cache/0.12.2/usb1.so");
 	port->pc->lh = lt_dlopenext (dir);
@@ -190,11 +190,13 @@ gp_port_set_android_fd(GPPort *port, int fd, const char* dir) {
 
 	if (set_fd == NULL) {
 		GP_LOG_E("Could not find gp_port_library_set_fd function");
-		return;
+		return GP_ERROR;
 	}
 
 	GP_LOG_D("set fd ===============> %d", fd);
 	set_fd(fd);
+
+	return GP_OK;
 }
 
 // int
