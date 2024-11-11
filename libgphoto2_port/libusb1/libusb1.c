@@ -229,7 +229,6 @@ gp_port_library_list (GPPortInfoList *list)
 	int		nrofdevs = 0;
 	struct libusb_device_descriptor	*descs;
 
-
 #ifdef  HAVE_LIBUSB_WRAP_SYS_DEVICE
 	if (has_external_fd()) {
 		ctx = external_sys_device.ctx;

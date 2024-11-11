@@ -1519,6 +1519,42 @@ ptp_pack_EOS_ImageFormat (PTPParams* params, unsigned char* data, uint16_t value
 	return s;
 }
 
+// lijing
+static inline char*
+ptp_unpack_EOS_PictureStyleEx (PTPParams* params, const unsigned char** data, uint32_t datasize) {
+    uint32_t size       = dtoh32a(*data);
+    uint32_t flag       = dtoh32a(*data + 4);
+    uint32_t contrast   = dtoh32a(*data + 8);
+    uint32_t strength   = dtoh32a(*data + 12);
+    uint32_t saturation = dtoh32a(*data + 16);
+    uint32_t color      = dtoh32a(*data + 20);
+    uint32_t fineness   = dtoh32a(*data + 32);
+    uint32_t throld     = dtoh32a(*data + 36);
+
+    // 使用gp_log记录所有变量
+    gp_log(GP_LOG_DEBUG, "lijing", 
+           "ljxxoo ==> PictureStyleEx: size=%d, flag=%d, contrast=%d, strength=%d, saturation=%d, color=%d, fineness=%d, throld=%d",
+           size, flag, contrast, strength, saturation, color, fineness, throld);
+
+    // 分配足够大的字符串并将所有变量连接为冒号分隔的字符串
+    char* result = (char*)malloc(88); // 预留足够空间
+    if (!result) return NULL;
+	bzero(result, 88);
+    sprintf(result, "%d:%d:%d:%d:%d:%d:%d:%d", size, flag, contrast, strength, saturation, color, fineness, throld);
+
+    return result;
+}
+
+static inline char*
+ptp_unpack_EOS_PictureStyleUserSetEx (PTPParams* params, const unsigned char** data, uint32_t datasize) {
+	uint32_t size 			= dtoh32a( *data );
+	uint32_t flag 			= dtoh32a( *data + 4);
+	uint32_t picture_style	= dtoh32a( *data + 8);
+	gp_log(GP_LOG_DEBUG, "lijing", "ljxxoo ==> PictureStyleUserSetEx: size=%d, flag=%d, picture_style=0x%x", size, flag, picture_style);
+
+	return "3:1:2:3";
+}
+
 /* 32 bit size
  * 16 bit subsize
  * 16 bit version (?)
@@ -2084,6 +2120,7 @@ ptp_unpack_EOS_events (PTPParams *params, const unsigned char* data, unsigned in
 			case PTP_DPC_CANON_EOS_HighISONoiseReduction:
 				dpd->DataType = PTP_DTC_UINT16;
 				break;
+			// lijing
 			case PTP_DPC_CANON_EOS_PictureStyle:
 			case PTP_DPC_CANON_EOS_WhiteBalance:
 			case PTP_DPC_CANON_EOS_MeteringMode:
@@ -2156,8 +2193,27 @@ ptp_unpack_EOS_events (PTPParams *params, const unsigned char* data, unsigned in
 			case PTP_DPC_CANON_EOS_FocusInfoEx:
 				dpd->DataType = PTP_DTC_UNDEF;
 				break;
+			// lijing
+			case PTP_DPC_CANON_EOS_PictureStyleExStandard:
+			case PTP_DPC_CANON_EOS_PictureStyleExPortrait:
+			case PTP_DPC_CANON_EOS_PictureStyleExLandscape:
+			case PTP_DPC_CANON_EOS_PictureStyleExNeutral:
+			case PTP_DPC_CANON_EOS_PictureStyleExFaithful:
+			case PTP_DPC_CANON_EOS_PictureStyleExFineDetail:
+				dpd->DataType = PTP_DTC_PSEX;
+				dpd->DefaultValue.str = ptp_unpack_EOS_PictureStyleEx( params, &xdata, xsize );
+				dpd->CurrentValue.str = strdup( (char*)dpd->DefaultValue.str );
+				break;
+			case PTP_DPC_CANON_EOS_PictureStyleExUserSet1:
+			case PTP_DPC_CANON_EOS_PictureStyleExUserSet2:
+			case PTP_DPC_CANON_EOS_PictureStyleExUserSet3:
+				dpd->DataType = PTP_DTC_PSEX;
+				dpd->DefaultValue.str = ptp_unpack_EOS_PictureStyleUserSetEx( params, &xdata, xsize );
+				dpd->CurrentValue.str = strdup( (char*)dpd->DefaultValue.str );
+				break;
 			default:
 				ptp_debug_data (params, xdata, xsize);
+				// GP_LOG_D("Lijing <<<<<<<<<< Lijing size: %d", xsize);
 				break;
 			}
 			switch (dpd->DataType) {

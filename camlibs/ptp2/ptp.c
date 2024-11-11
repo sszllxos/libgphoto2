@@ -3905,6 +3905,116 @@ ptp_canon_eos_setdevicepropvalueex (PTPParams* params, unsigned char* data, unsi
 	return ptp_transaction(params, &ptp, PTP_DP_SENDDATA, size, &data, NULL);
 }
 
+// lijing
+static int
+picture_style_ex(PTPParams* params, uint16_t propcode, PTPPropValue *value) {
+	PTPContainer	ptp;
+	unsigned char	*data = NULL;
+	unsigned int	size = 48;
+	uint16_t	ret;
+	int base = 16;
+
+    int c_picturestyle = 99;
+    int c_strength = 99;
+    int c_fineness = 99;
+    int c_threshold = 99;
+    int c_contrast = 99;
+    int c_saturation = 99;
+    int c_colortone = 99;
+    int c_filtereffect = 99;
+    int c_toningeffect = 99;
+
+	PTPDevicePropDesc *dpd = ptp_find_eos_devicepropdesc(params, propcode);
+	if (!dpd)
+		return PTP_RC_Undefined;
+
+	PTP_CNT_INIT(ptp, PTP_OC_CANON_EOS_SetDevicePropValueEx);
+
+    char *curr_pair = strtok(dpd->CurrentValue.str, ":");
+    int index = 0;
+
+    while (curr_pair != NULL) {
+        int value = atoi(curr_pair);
+
+        if (index == 2) c_contrast = value;
+        else if (index == 3) c_strength = value;
+        else if (index == 4) c_saturation = value;
+        else if (index == 5) c_colortone = value;
+        else if (index == 6) c_fineness = value;
+        else if (index == 7) c_threshold = value;
+        else if (index == 8) c_filtereffect = value;
+        else if (index == 9) c_toningeffect = value;
+
+        curr_pair = strtok(NULL, ":");
+        index++;
+    }
+
+	int picturestyle = c_picturestyle;
+    int strength = c_strength;
+    int fineness = c_fineness;
+    int threshold = c_threshold;
+    int contrast = c_contrast;
+    int saturation = c_saturation;
+    int colortone = c_colortone;
+    int filtereffect = c_filtereffect;
+  	int toningeffect = c_toningeffect;
+
+	gp_log(GP_LOG_ERROR, "lijing", "ljxx1oo ==> strength=%d, contrast=%d, saturation=%d, colortone=%d, fineness=%d, threshold=%d, filtereffect=%d, toningeffect=%d\n",
+	 											strength, 	contrast, 	saturation, 	colortone, 	fineness, 	threshold, filtereffect, toningeffect);
+
+	// picturestyle:3;strength:-2;fineness:1;threshold:0;constrast:1;saturation:2;colortone:4;filtereffect:1;toningeffect:2
+	if (value->str == NULL) {
+		gp_log(GP_LOG_ERROR, "lijing", "ljxx1oo ==> value->str is NULL");
+		return PTP_RC_GeneralError;
+	}
+
+	char *pair = strtok(value->str, ";"); // 按分号分割
+    while (pair != NULL) {
+        char key[20];
+        int value;
+
+        // 解析 x:y 格式的键值对
+        if (sscanf(pair, "%19[^:]:%d", key, &value) == 2) {
+            // 根据键名及值的差异性条件判断赋值
+            if (strcmp(key, "picturestyle") == 0 && value != c_picturestyle) picturestyle = value;
+            else if (strcmp(key, "strength") == 0 && value != c_strength) strength = value;
+            else if (strcmp(key, "fineness") == 0 && value != c_fineness) fineness = value;
+            else if (strcmp(key, "threshold") == 0 && value != c_threshold) threshold = value;
+            else if (strcmp(key, "contrast") == 0 && value != c_contrast) contrast = value;
+            else if (strcmp(key, "saturation") == 0 && value != c_saturation) saturation = value;
+            else if (strcmp(key, "colortone") == 0 && value != c_colortone) colortone = value;
+            else if (strcmp(key, "filtereffect") == 0 && value != c_filtereffect) filtereffect = value;
+            else if (strcmp(key, "toningeffect") == 0 && value != c_toningeffect) toningeffect = value;
+        }
+
+        pair = strtok(NULL, ";"); // 获取下一个键值对
+    }
+
+	data = calloc(size,sizeof(char));
+	memset(data, 0, size);
+
+	htod32a(&data[0], size);
+	htod32a(&data[4], propcode);
+
+	// contrast
+	memcpy(data+base, &contrast, sizeof(int));
+	// sharpness-strength
+	memcpy(data+base+4, &strength, sizeof(int));
+	// saturation
+	memcpy(data+base+8, &saturation, sizeof(int));
+	// color tone
+	memcpy(data+base+12, &colortone, sizeof(int));
+	// sharpness-fineness
+	memcpy(data+base+24, &fineness, sizeof(int));
+	// sharpness-throld
+	memcpy(data+base+28, &threshold, sizeof(int));
+
+	ret = ptp_transaction(params, &ptp, PTP_DP_SENDDATA, size, &data, NULL);
+	free(data);
+
+	return ret;
+}
+
 uint16_t
 ptp_canon_eos_setdevicepropvalue (PTPParams* params,
 	uint16_t propcode, PTPPropValue *value, uint16_t datatype
@@ -3939,6 +4049,9 @@ ptp_canon_eos_setdevicepropvalue (PTPParams* params,
 		if (!data) return PTP_RC_GeneralError;
 		ptp_pack_EOS_CustomFuncEx( params, data + 8, value->str );
 		break;
+	// lijing
+	case PTP_DPC_CANON_EOS_PictureStyleExStandard:
+		return picture_style_ex(params, propcode, value);
 	default:
 		if (datatype != PTP_DTC_STR)
 			size = sizeof(uint32_t)*3;

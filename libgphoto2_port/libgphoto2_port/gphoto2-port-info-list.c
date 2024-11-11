@@ -240,10 +240,6 @@ foreach_func (const char *filename, lt_ptr data)
 	int result;
 	char *prefix = getenv(IOLIBDIR_PREFIX_ENV);
 
-	// 如果 filename 不包含 usb1.so，则直接 return
-	if (!strstr (filename, "usb1"))
-		return (0);
-
 	GP_LOG_D ("Called for filename '%s'.", filename );
 	if(prefix && !strstr(filename,prefix)) {
 		GP_LOG_D("Skipping filename '%s' not matching %s.",filename,prefix);
@@ -331,9 +327,8 @@ gp_port_info_list_load (GPPortInfoList *list)
 	result = lt_dlforeachfile (iolibs, foreach_func, list);
 	lt_dlexit ();
 	gpi_libltdl_unlock();
-	if (result < 0) {
+	if (result < 0)
 		return (result);
-	}
 	if (list->iolib_count == 0) {
 		GP_LOG_E ("No iolibs found in '%s'", iolibs);
 		return GP_ERROR_LIBRARY;

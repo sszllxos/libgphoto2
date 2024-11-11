@@ -10866,6 +10866,16 @@ _get_PTP_Manufacturer_STR(CONFIG_GET_ARGS) {
 	return GP_OK;
 }
 
+// lijing
+static int
+_get_Canon_EOS_PictureStyleExStandard_STR(CONFIG_GET_ARGS) {
+	// PTPParams	*params = &camera->pl->params;
+	gp_widget_new (GP_WIDGET_TEXT, _(menu->label), widget);
+	gp_widget_set_name (*widget, menu->name);
+	gp_widget_set_value (*widget, dpd->CurrentValue.str);
+
+	return GP_OK;
+}
 
 static struct submenu camera_actions_menu[] = {
 	/* { N_("Viewfinder Mode"), "viewfinder", PTP_DPC_CANON_ViewFinderMode, PTP_VENDOR_CANON, PTP_DTC_UINT32, _get_Canon_ViewFinderMode, _put_Canon_ViewFinderMode}, */
@@ -11198,7 +11208,10 @@ static struct submenu capture_settings_menu[] = {
 	{ N_("Canon Auto Exposure Mode"),       "autoexposuremode",         PTP_DPC_CANON_EOS_AutoExposureMode,     PTP_VENDOR_CANON,   PTP_DTC_UINT16, _get_Canon_EOS_AutoExposureMode,    _put_Canon_EOS_AutoExposureMode },
 	{ N_("Canon Auto Exposure Mode Dial"),  "autoexposuremodedial",     PTP_DPC_CANON_EOS_AEModeDial,           PTP_VENDOR_CANON,   PTP_DTC_UINT16, _get_Canon_EOS_AutoExposureMode,    _put_Canon_EOS_AutoExposureMode },
 	{ N_("Drive Mode"),                     "drivemode",                PTP_DPC_CANON_EOS_DriveMode,            PTP_VENDOR_CANON,   PTP_DTC_UINT16, _get_Canon_EOS_DriveMode,           _put_Canon_EOS_DriveMode },
+	// lijing
 	{ N_("Picture Style"),                  "picturestyle",             PTP_DPC_CANON_EOS_PictureStyle,         PTP_VENDOR_CANON,   PTP_DTC_UINT8,  _get_Canon_EOS_PictureStyle,        _put_Canon_EOS_PictureStyle },
+	{ N_("Picture Style Ex Standard"),      "picturestyleexstandard",   PTP_DPC_CANON_EOS_PictureStyleExStandard,         PTP_VENDOR_CANON,   PTP_DTC_PSEX,  _get_STR,        _put_STR },
+	// { N_("Picture Style"),                  "picturestyle",             PTP_DPC_CANON_EOS_PictureStyle,         PTP_VENDOR_CANON,   PTP_DTC_STR,    _get_Canon_EOS_PictureStyle_STR,        _put_STR },
 	{ N_("Focus Metering Mode"),            "focusmetermode",           PTP_DPC_FocusMeteringMode,              0,                  PTP_DTC_UINT16, _get_FocusMetering,                 _put_FocusMetering },
 	{ N_("Focus Metering Mode"),            "exposuremetermode",        PTP_DPC_OLYMPUS_ExposureMeteringMode,   PTP_VENDOR_GP_OLYMPUS_OMD, PTP_DTC_UINT16, _get_ExposureMetering,       _put_ExposureMetering },
 	{ N_("Exposure Metering Mode"),         "exposuremetermode",        PTP_DPC_ExposureMeteringMode,           0,                  PTP_DTC_UINT16, _get_ExposureMetering,              _put_ExposureMetering },

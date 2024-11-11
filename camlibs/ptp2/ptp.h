@@ -1926,6 +1926,8 @@ typedef struct _PTPCanonEOSDeviceInfo {
 #define PTP_DTC_AINT128		(PTP_DTC_ARRAY_MASK | PTP_DTC_INT128)
 #define PTP_DTC_AUINT128	(PTP_DTC_ARRAY_MASK | PTP_DTC_UINT128)
 
+// lijing
+#define PTP_DTC_PSEX	0xFFF0
 #define PTP_DTC_STR		0xFFFF
 
 /* Device Properties Codes */
