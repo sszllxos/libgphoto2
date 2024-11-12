@@ -10869,7 +10869,6 @@ _get_PTP_Manufacturer_STR(CONFIG_GET_ARGS) {
 // lijing
 static int
 _get_Canon_EOS_PictureStyleExStandard_STR(CONFIG_GET_ARGS) {
-	// PTPParams	*params = &camera->pl->params;
 	gp_widget_new (GP_WIDGET_TEXT, _(menu->label), widget);
 	gp_widget_set_name (*widget, menu->name);
 	gp_widget_set_value (*widget, dpd->CurrentValue.str);
@@ -11211,7 +11210,15 @@ static struct submenu capture_settings_menu[] = {
 	// lijing
 	{ N_("Picture Style"),                  "picturestyle",             PTP_DPC_CANON_EOS_PictureStyle,         PTP_VENDOR_CANON,   PTP_DTC_UINT8,  _get_Canon_EOS_PictureStyle,        _put_Canon_EOS_PictureStyle },
 	{ N_("Picture Style Ex Standard"),      "picturestyleexstandard",   PTP_DPC_CANON_EOS_PictureStyleExStandard,         PTP_VENDOR_CANON,   PTP_DTC_PSEX,  _get_STR,        _put_STR },
-	// { N_("Picture Style"),                  "picturestyle",             PTP_DPC_CANON_EOS_PictureStyle,         PTP_VENDOR_CANON,   PTP_DTC_STR,    _get_Canon_EOS_PictureStyle_STR,        _put_STR },
+	{ N_("Picture Style Ex Portrait"),      "picturestyleexportrait",   PTP_DPC_CANON_EOS_PictureStyleExPortrait,         PTP_VENDOR_CANON,   PTP_DTC_PSEX,  _get_STR,        _put_STR },
+	{ N_("Picture Style Ex Landscape"),      "picturestyleexlandscape",   PTP_DPC_CANON_EOS_PictureStyleExLandscape,         PTP_VENDOR_CANON,   PTP_DTC_PSEX,  _get_STR,        _put_STR },
+	{ N_("Picture Style Ex Neutral"),      "picturestyleexneutral",   PTP_DPC_CANON_EOS_PictureStyleExNeutral,         PTP_VENDOR_CANON,   PTP_DTC_PSEX,  _get_STR,        _put_STR },
+	{ N_("Picture Style Ex Faithful"),      "picturestyleexfaithful",   PTP_DPC_CANON_EOS_PictureStyleExFaithful,         PTP_VENDOR_CANON,   PTP_DTC_PSEX,  _get_STR,        _put_STR },
+	{ N_("Picture Style Ex BlackWhite"),      "picturestyleexblackwhite",   PTP_DPC_CANON_EOS_PictureStyleExBlackWhite,         PTP_VENDOR_CANON,   PTP_DTC_PSEX,  _get_STR,        _put_STR },
+	{ N_("Picture Style Ex FineDetail"),      "picturestyleexfinedetail",   PTP_DPC_CANON_EOS_PictureStyleExFineDetail,         PTP_VENDOR_CANON,   PTP_DTC_PSEX,  _get_STR,        _put_STR },
+	{ N_("Picture Style Ex UserSet1"),      "picturestyleexuserset1",   PTP_DPC_CANON_EOS_PictureStyleExUserSet1,         PTP_VENDOR_CANON,   PTP_DTC_PSEX,  _get_STR,        _put_STR },
+	{ N_("Picture Style Ex UserSet2"),      "picturestyleexuserset2",   PTP_DPC_CANON_EOS_PictureStyleExUserSet2,         PTP_VENDOR_CANON,   PTP_DTC_PSEX,  _get_STR,        _put_STR },
+	{ N_("Picture Style Ex UserSet3"),      "picturestyleexuserset3",   PTP_DPC_CANON_EOS_PictureStyleExUserSet3,         PTP_VENDOR_CANON,   PTP_DTC_PSEX,  _get_STR,        _put_STR },
 	{ N_("Focus Metering Mode"),            "focusmetermode",           PTP_DPC_FocusMeteringMode,              0,                  PTP_DTC_UINT16, _get_FocusMetering,                 _put_FocusMetering },
 	{ N_("Focus Metering Mode"),            "exposuremetermode",        PTP_DPC_OLYMPUS_ExposureMeteringMode,   PTP_VENDOR_GP_OLYMPUS_OMD, PTP_DTC_UINT16, _get_ExposureMetering,       _put_ExposureMetering },
 	{ N_("Exposure Metering Mode"),         "exposuremetermode",        PTP_DPC_ExposureMeteringMode,           0,                  PTP_DTC_UINT16, _get_ExposureMetering,              _put_ExposureMetering },

@@ -4051,6 +4051,12 @@ ptp_canon_eos_setdevicepropvalue (PTPParams* params,
 		break;
 	// lijing
 	case PTP_DPC_CANON_EOS_PictureStyleExStandard:
+	case PTP_DPC_CANON_EOS_PictureStyleExPortrait:
+	case PTP_DPC_CANON_EOS_PictureStyleExLandscape:
+	case PTP_DPC_CANON_EOS_PictureStyleExNeutral:
+	case PTP_DPC_CANON_EOS_PictureStyleExFaithful:
+	case PTP_DPC_CANON_EOS_PictureStyleExBlackWhite:
+	case PTP_DPC_CANON_EOS_PictureStyleExFineDetail:
 		return picture_style_ex(params, propcode, value);
 	default:
 		if (datatype != PTP_DTC_STR)
